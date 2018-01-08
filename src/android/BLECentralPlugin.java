@@ -115,7 +115,8 @@ public class BLECentralPlugin extends CordovaPlugin implements BluetoothAdapter.
 
     @Override
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-        LOG.d(TAG, "action = " + action);
+
+        LOG.e(TAG, "action = " + action);
 
         if (bluetoothAdapter == null) {
             Activity activity = cordova.getActivity();
@@ -171,6 +172,7 @@ public class BLECentralPlugin extends CordovaPlugin implements BluetoothAdapter.
             String macAddress = args.getString(0);
             disconnect(callbackContext, macAddress);
 
+
         } else if (action.equals(READ)) {
 
             String macAddress = args.getString(0);
@@ -225,8 +227,11 @@ public class BLECentralPlugin extends CordovaPlugin implements BluetoothAdapter.
 
         } else if (action.equals(IS_CONNECTED)) {
 
+            //la mac que le paso
             String macAddress = args.getString(0);
 
+
+            //si la mac figura entre los dispositivo y esta conectada
             if (peripherals.containsKey(macAddress) && peripherals.get(macAddress).isConnected()) {
                 callbackContext.success();
             } else {
@@ -364,7 +369,10 @@ public class BLECentralPlugin extends CordovaPlugin implements BluetoothAdapter.
 
     private void disconnect(CallbackContext callbackContext, String macAddress) {
 
+        //obtiene el dispositivo
         Peripheral peripheral = peripherals.get(macAddress);
+
+        //desconecta
         if (peripheral != null) {
             peripheral.disconnect();
         }
@@ -470,6 +478,7 @@ public class BLECentralPlugin extends CordovaPlugin implements BluetoothAdapter.
 
     private void findLowEnergyDevices(CallbackContext callbackContext, UUID[] serviceUUIDs, int scanSeconds) {
 
+        //si no tiene permiso
         if(!PermissionHelper.hasPermission(this, ACCESS_COARSE_LOCATION)) {
             // save info so we can call this method again after permissions are granted
             permissionCallback = callbackContext;
@@ -479,18 +488,18 @@ public class BLECentralPlugin extends CordovaPlugin implements BluetoothAdapter.
             return;
         }
 
-        // ignore if currently scanning, alternately could return an error
+        //ignore if currently scanning, alternately could return an error
         if (bluetoothAdapter.isDiscovering()) {
             return;
         }
 
-        // clear non-connected cached peripherals
+        //clear non-connected cached peripherals
         for(Iterator<Map.Entry<String, Peripheral>> iterator = peripherals.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Peripheral> entry = iterator.next();
             Peripheral device = entry.getValue();
             boolean connecting = device.isConnecting();
             if (connecting){
-                LOG.d(TAG, "Not removing connecting device: " + device.getDevice().getAddress());
+                LOG.e(TAG, "Not removing connecting device: " + device.getDevice().getAddress());
             }
             if(!entry.getValue().isConnected() && !connecting) {
                 iterator.remove();
@@ -505,12 +514,13 @@ public class BLECentralPlugin extends CordovaPlugin implements BluetoothAdapter.
             bluetoothAdapter.startLeScan(this);
         }
 
+        //si declare un tiempo
         if (scanSeconds > 0) {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    LOG.d(TAG, "Stopping Scan");
+                    LOG.e(TAG, "Stopping Scan");
                     BLECentralPlugin.this.bluetoothAdapter.stopLeScan(BLECentralPlugin.this);
                 }
             }, scanSeconds * 1000);

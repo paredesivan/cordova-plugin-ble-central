@@ -67,7 +67,9 @@ public class Peripheral extends BluetoothGattCallback {
 
     private void gattConnect() {
 
+
         queueCleanup();
+
         if (gatt != null) {
             gatt.disconnect();
             gatt.close();
@@ -85,10 +87,13 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     public void connect(CallbackContext callbackContext, Activity activity, boolean auto) {
+    LOG.e(TAG, "entre a connect de java");
+
         currentActivity = activity;
         autoconnect = auto;
         connectCallback = callbackContext;
 
+        //cada vez que trata de conectar limpia la cola
         gattConnect();
 
         PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -103,6 +108,7 @@ public class Peripheral extends BluetoothGattCallback {
         queueCleanup();
 
         if (gatt != null) {
+         LOG.e(TAG, "desconectando y cerrando");
             gatt.disconnect();
             gatt.close();
             gatt = null;
