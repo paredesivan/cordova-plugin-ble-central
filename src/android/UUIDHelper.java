@@ -38,6 +38,7 @@ public class UUIDHelper {
         Pattern pattern = Pattern.compile("0000(.{4})-0000-1000-8000-00805f9b34fb", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(longUUID);
         if (matcher.matches()) {
+
             // 16 bit UUID
             return matcher.group(1);
         } else {
